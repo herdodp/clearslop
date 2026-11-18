@@ -1,54 +1,58 @@
-<!-- clearslop-ignore-file: berkas ini memuat pola pemicu sebagai contoh -->
-# Aturan Kode dan Komentar (CS-CD)
+<!-- clearslop-ignore-file: this file lists trigger patterns as examples -->
+# Code and comment rules (CS-CD)
 
-Aturan ini menolak pola kode dan komentar yang khas keluaran AI: komentar yang hanya mengulang kode, hiasan, dan penanganan yang tidak perlu. Tingkat: `block`, `warn`, `hint`.
+These rules reject code and comment patterns typical of AI output: comments that only restate the code, decoration, and needless handling. Levels: `block`, `warn`, `hint`.
 
-Prinsip: komentar menjelaskan *mengapa*, bukan *apa*. Kode yang sudah jelas tidak perlu komentar. Aturan ini tidak mengubah perilaku program, hanya membersihkan bentuknya.
+Principle: a comment explains *why*, not *what*. Code that is already clear needs no comment. These rules do not change program behavior; they only clean up its shape.
 
-## Komentar
+The scanner implements only some of these rules. Run `explain <RULE_ID>` to check whether a rule has a detector.
 
-| ID | Tingkat | Pola | Deteksi |
+## Comments
+
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-CD-001 | warn | Komentar yang mengulang baris di bawahnya | Komentar satu baris yang berisi kata kerja dan nama yang sama dengan baris kode berikutnya (mis. `// increment counter` di atas `counter++`) |
-| CS-CD-002 | warn | Spanduk pemisah dekoratif | Baris komentar berisi deretan `=`, `-`, `*`, `#` lebih dari 10 karakter, atau karakter garis/kotak Unicode (blok U+2500 sampai U+257F) |
-| CS-CD-003 | warn | Emoji di dalam komentar atau log | Karakter emoji pada komentar, `console.log`, `print`, atau `logger` |
-| CS-CD-004 | hint | Komentar penanda bagian yang kosong makna | `// Imports`, `// Constants`, `// Helper functions`, `// Main function`, `# Variables` |
-| CS-CD-005 | warn | Komentar jejak AI | `Here's the`, `As an AI`, `Let me`, `Sure,`, `This function does the following`, `Berikut adalah`, `Fungsi ini melakukan` |
-| CS-CD-006 | hint | Docstring/JSDoc yang hanya mengulang tanda tangan fungsi | Deskripsi param/return yang hanya mengulang nama dan tipe tanpa informasi tambahan |
-| CS-CD-007 | block | Komentar `TODO`/`FIXME` tanpa pemilik atau konteks | `TODO` tanpa deskripsi, atau `TODO: implement` pada fungsi yang sudah diimplementasi |
-| CS-CD-008 | hint | Kode yang dikomentari (dimatikan) dibiarkan | Tiga baris berurutan atau lebih berupa kode yang dikomentari |
+| CS-CD-001 | warn | Comment that repeats the line below it | A short one-line comment sharing its key words with the next line of code (for example `// increment counter` above `counter++`) |
+| CS-CD-002 | warn | Decorative divider banner | A comment line with a run of 10 or more `=`, `-`, `*`, `#`, `_`, or `~`, or three or more Unicode box-drawing characters (U+2500 to U+257F) |
+| CS-CD-003 | warn | Emoji in a comment or log | An emoji (emoji presentation) in a comment, `console.log`, `print`, or `logger` line |
+| CS-CD-004 | hint | Section marker comment with no meaning | `// Imports`, `// Constants`, `// Helper functions`, `// Main function`, `# Variables` |
+| CS-CD-005 | warn | AI trace comment | A comment containing "As an AI", "Let me", "Here is the", or "This function does the following". The detector also matches two Indonesian equivalents |
+| CS-CD-006 | hint | Docstring or JSDoc that only repeats the function signature | Not implemented |
+| CS-CD-007 | warn | `TODO`/`FIXME` with no description, owner, or context | A comment that ends right after `TODO` or `FIXME` |
+| CS-CD-008 | hint | Commented-out code left behind | Three or more consecutive lines of commented-out code |
 
-## Kode
+## Code
 
-| ID | Tingkat | Pola | Deteksi |
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-CD-020 | warn | Blok `try/catch` yang menelan galat | `catch` kosong, atau `catch` yang hanya `console.log(e)`/`pass`/`print(e)` tanpa penanganan |
-| CS-CD-021 | hint | Penanganan berlapis yang tidak perlu | `try/catch` membungkus satu baris yang tidak bisa melempar galat, atau pengecekan null/undefined/falsy berulang untuk variabel yang sama |
-| CS-CD-022 | warn | Nama generik tanpa makna | `data`, `result`, `temp`, `item`, `obj`, `handleClick`, `processData` sebagai nama fungsi atau variabel utama pada lebih dari tiga tempat |
-| CS-CD-023 | warn | Fungsi pembungkus yang tidak menambah apa pun | Fungsi satu baris yang hanya memanggil fungsi lain dengan argumen yang sama |
-| CS-CD-024 | hint | Konstanta untuk nilai yang dipakai sekali dengan komentar panjang | `const MAX = 5 // maximum` yang hanya dipakai satu kali |
-| CS-CD-025 | warn | Fallback diam-diam yang menyembunyikan galat | Operator fallback (OR logis atau nullish coalescing) ke `[]`, `{}`, atau string kosong pada data yang seharusnya wajib ada |
-| CS-CD-026 | block | Rahasia atau kunci tertanam di kode | Pola `sk-`, `AKIA`, `ghp_`, `api_key = "..."`, `password = "..."` dengan nilai literal |
-| CS-CD-027 | hint | `console.log`/`print` debug tertinggal | `console.log`/`print` di luar berkas uji dan skrip CLI |
-| CS-CD-028 | warn | Fungsi terlalu panjang tanpa alasan | Fungsi lebih dari 80 baris |
+| CS-CD-020 | warn | `try/catch` or `try/except` that swallows errors | An empty `catch` block, a `catch` containing only `console.log(...)`, or an `except` block containing only `pass` or `print(...)` |
+| CS-CD-021 | hint | Needless layered handling | Not implemented |
+| CS-CD-022 | warn | Generic names with no meaning (`data`, `result`, `temp`, `item`, `obj`, `handleClick`, `processData`) | Not implemented |
+| CS-CD-023 | warn | Wrapper function that adds nothing | Not implemented |
+| CS-CD-024 | hint | Constant for a value used once, with a long comment | Not implemented |
+| CS-CD-025 | warn | Silent fallback that hides an error (`|| []`, `?? {}`, `|| ""` on data that must exist) | Not implemented |
+| CS-CD-026 | block | Hardcoded secret or key | Known token formats (`sk-`, `AKIA`, `ghp_`, Slack `xox*-`, Google `AIza`, private key headers) and `api_key`/`password`/`secret`/`token` assigned a literal value. Scans code files and config files (`.json`, `.yml`, `.yaml`, `.toml`, `.ini`, `.cfg`, `.conf`, `.properties`). Values that look like placeholders (`your_...`, `changeme`, `<...>`, `${...}`) are ignored |
+| CS-CD-027 | hint | Leftover debug `console.log`/`print` | `console.log(` outside tooling paths. A path counts as tooling when a whole directory segment is `test`, `tests`, `__tests__`, `spec`, `cli`, `bin`, or `scripts`, or the file name contains `test`, `spec`, or `cli` as a separate word. Files starting with a shebang are skipped |
+| CS-CD-028 | warn | Function that is too long for no reason | Not implemented |
 
-## README, commit, dan PR
+## README, commits, and pull requests
 
-| ID | Tingkat | Pola | Deteksi |
+These are guidance for authors and reviewers. The scanner does not check them.
+
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-CD-040 | warn | Pesan commit generik | `update`, `fix`, `changes`, `wip`, `misc` sebagai satu-satunya pesan |
-| CS-CD-041 | hint | Pesan commit berlebihan dan berhias | Emoji pada pesan commit, atau baris pertama lebih dari 72 karakter |
-| CS-CD-042 | warn | Deskripsi PR berisi bagian templat kosong | `## Summary` / `## Changes` yang hanya mengulang judul PR |
-| CS-CD-043 | warn | README dengan bagian templat tanpa isi | `## Features`, `## Installation`, `## Contributing` yang isinya generik atau tidak sesuai proyek |
+| CS-CD-040 | warn | Generic commit message | Not implemented. `update`, `fix`, `changes`, `wip`, `misc` as the whole message |
+| CS-CD-041 | hint | Over-decorated commit message | Not implemented. Emoji in the message, or a first line over 72 characters |
+| CS-CD-042 | warn | PR description with empty template sections | Not implemented. `## Summary` or `## Changes` that only repeat the PR title |
+| CS-CD-043 | warn | README with template sections that say nothing | Not implemented. Generic `## Features`, `## Installation`, `## Contributing` content that does not fit the project |
 
-## Cara memperbaiki
+## How to fix
 
-1. Hapus komentar yang hanya mengulang kode. Pertahankan komentar yang menjelaskan alasan, batasan, atau jebakan.
-2. Ganti nama generik dengan nama yang menyebut isi dan perannya.
-3. Perlakukan `catch` kosong sebagai temuan perilaku: tangani galat dengan benar atau biarkan naik. Jangan sekadar menghapus komentar di dalamnya.
-4. Temuan `CS-CD-026` (rahasia) harus ditindaklanjuti dengan memindahkan nilai ke variabel lingkungan dan mencabut kunci yang sudah terlanjur terekspos.
-5. Jalankan ulang `scan --only code` dan pastikan uji yang ada tetap lolos.
+1. Delete comments that only repeat the code. Keep comments that explain a reason, a limit, or a trap.
+2. Replace generic names with names that state the content and role.
+3. Treat an empty `catch` as a behavior finding: handle the error properly or let it propagate. Do not just delete the comment inside it.
+4. A `CS-CD-026` finding must be fixed by moving the value to an environment variable and revoking any key that was already exposed.
+5. Rescan with `scan --only code` and make sure the existing tests still pass.
 
-## Pengecualian sah
+## Valid exceptions
 
-Catat di `.clearslop/allow.json` dengan alasan bila: komentar dibutuhkan oleh alat (mis. `// eslint-disable`, `# noqa`, `@ts-expect-error`), kode dibuat oleh generator, atau berkas adalah contoh/uji untuk slop itu sendiri.
+Record an entry in `.clearslop/allow.json` with a reason when: a comment is required by a tool (for example `// eslint-disable`, `# noqa`, `@ts-expect-error`), the code is generated, or the file is an example or test for slop itself.

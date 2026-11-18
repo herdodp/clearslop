@@ -1,66 +1,68 @@
-<!-- clearslop-ignore-file: berkas ini memuat frasa pemicu sebagai contoh -->
-# Aturan Teks Bahasa Inggris (CS-EN)
+<!-- clearslop-ignore-file: this file lists trigger phrases as examples -->
+# English copy rules (CS-EN)
 
-Aturan ini menolak pola tulisan yang terdengar seperti keluaran AI generik: klaim tanpa isi, hype, dan kerangka kalimat yang bisa ditempel ke produk apa pun. Tingkat: `block`, `warn`, `hint`.
+These rules reject writing that sounds like generic AI output: empty claims, hype, and sentence frames that could be pasted onto any product. Levels: `block`, `warn`, `hint`.
 
-Prinsip: setiap kalimat harus memuat sesuatu yang spesifik dan benar tentang produk. Jika tidak ada, hapus kalimatnya.
+Principle: every sentence must say something specific and true about the product. If it does not, delete the sentence.
 
-## Kalimat pembuka dan penutup generik
+The scanner implements only some of these rules. Run `explain <RULE_ID>` to check whether a rule has a detector. Phrases match case-insensitively on whole words; a trailing `*` in the table below means any word ending is accepted (for example `leverag*` matches leverage, leveraged, leveraging).
 
-| ID | Tingkat | Pola | Contoh pemicu |
+## Generic openers and closers
+
+| ID | Level | Pattern | Trigger examples |
 |---|---|---|---|
-| CS-EN-001 | warn | Pembuka era/dunia | "In today's fast-paced digital world", "In the ever-evolving landscape of", "In an era where" |
-| CS-EN-002 | warn | Penutup rangkuman kosong | "In conclusion,", "In summary,", "Overall," di awal paragraf penutup |
-| CS-EN-003 | warn | Ajakan klise di akhir | "Ready to take your X to the next level?", "Unlock the power of", "Start your journey today" |
-| CS-EN-004 | hint | Pembuka basa-basi pada balasan atau dokumen | "Certainly!", "Great question!", "I'd be happy to help", "Absolutely!" |
+| CS-EN-001 | warn | Generic era or world opener | "fast-paced digital", "ever-evolving", "an era where" |
+| CS-EN-002 | warn | Empty summary closer | "In conclusion,", "In summary," |
+| CS-EN-003 | warn | Cliche call to action | "to the next level", "unlock the power", "start your journey" |
+| CS-EN-004 | hint | Pleasantry opener in a reply or document | "Certainly!", "Great question!", "be happy to help", "Absolutely!" |
 
-## Kosakata hype
+## Hype vocabulary
 
-| ID | Tingkat | Pola | Contoh pemicu |
+| ID | Level | Pattern | Trigger examples |
 |---|---|---|---|
-| CS-EN-010 | warn | Kata sifat superlatif tanpa bukti | "revolutionary", "game-changing", "cutting-edge", "next-generation", "world-class", "best-in-class" |
-| CS-EN-011 | warn | Kata kerja berlebihan | "leverage", "harness", "unleash", "supercharge", "elevate", "empower", "streamline", "seamlessly" |
-| CS-EN-012 | hint | Kata "AI-favorit" yang jarang dipakai manusia | "delve", "tapestry", "testament", "realm", "multifaceted", "navigate the complexities" |
-| CS-EN-013 | warn | Klaim universal | "for everyone", "all your needs", "everything you need", "one-stop solution" |
-| CS-EN-014 | block | Klaim angka tanpa sumber | "10x faster", "99% accuracy", "save hours every day" tanpa data atau tautan |
+| CS-EN-010 | warn | Superlative without evidence | "revolutionar*", "game-changing", "cutting-edge", "next-generation", "world-class", "best-in-class" |
+| CS-EN-011 | warn | Inflated verb | "leverag*", "harness the", "unleash*", "supercharg*", "elevate your", "empower*", "streamlin*", "seamless*" |
+| CS-EN-012 | hint | Favorite AI word that people rarely use | "delv*", "tapestry", "testament to", "realm of", "multifaceted", "navigate the complexities" |
+| CS-EN-013 | warn | Universal claim | "for everyone", "all your needs", "everything you need", "one-stop" |
+| CS-EN-014 | warn | Unsourced numeric claim | "10x faster", "99% accuracy", "save hours" with no data or link. A sourced figure belongs in `allow.json` with a reason |
 
-## Pola struktur kalimat
+## Sentence structure
 
-| ID | Tingkat | Pola | Deteksi |
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-EN-020 | warn | Kontras "bukan X, melainkan Y" berulang | "It's not just X, it's Y", "Not only X but also Y" lebih dari dua kali per dokumen |
-| CS-EN-021 | warn | Tiga serangkai paksa | Daftar tiga kata sifat/kata benda berirama ("fast, simple, and powerful") lebih dari dua kali per dokumen |
-| CS-EN-022 | hint | Kalimat tanya retoris sebagai pembuka section | Baris pertama section diakhiri "?" lebih dari tiga kali per dokumen |
-| CS-EN-023 | hint | Penggunaan tanda pisah (em dash) berlebihan | Lebih dari dua "â€”" per 200 kata |
-| CS-EN-024 | hint | Kata sambung berantai di awal kalimat | "Moreover,", "Furthermore,", "Additionally," lebih dari tiga kali per dokumen |
-| CS-EN-025 | warn | Kalimat penjelas diri ("This means that...", "Simply put,") setelah setiap poin | Lebih dari dua kemunculan per dokumen |
+| CS-EN-020 | warn | Repeated "not just X, but Y" contrast | "not just" or "not only" on three or more lines in one file |
+| CS-EN-021 | warn | Forced triplet | Not implemented. Rhythmic lists of three adjectives or nouns ("fast, simple, and powerful") more than twice per document |
+| CS-EN-022 | hint | Rhetorical question opening a section | Not implemented |
+| CS-EN-023 | hint | Em dash overuse | Not implemented |
+| CS-EN-024 | hint | Chained transition words at sentence starts | "Moreover,", "Furthermore,", "Additionally," on four or more lines |
+| CS-EN-025 | warn | Self-explaining sentence after every point | "Simply put,", "This means that", "In other words," on three or more lines |
 
-## Judul, tombol, dan mikroteks
+## Headings, buttons, and microcopy
 
-| ID | Tingkat | Pola | Deteksi |
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-EN-030 | warn | Judul huruf kapital semua dengan tanda seru | Teks `h1`-`h3` atau tombol: huruf besar semua + "!" |
-| CS-EN-031 | warn | Tombol CTA generik | "Get Started", "Learn More", "Click Here", "Submit" sebagai satu-satunya label tombol utama |
-| CS-EN-032 | warn | Emoji sebagai poin daftar atau awalan judul | Emoji di awal baris daftar atau judul |
-| CS-EN-033 | hint | Pesan galat atau status yang ramah berlebihan | "Oops!", "Uh-oh!", "Whoops!" |
-| CS-EN-034 | hint | Teks placeholder deskriptif generik | "Enter your text here", "Type something..." |
+| CS-EN-030 | warn | All-caps heading or button with an exclamation mark | `h1`-`h3` or button text that is all caps and ends with "!" |
+| CS-EN-031 | warn | Generic CTA button | "Get Started", "Learn More", "Click Here", "Submit" as a button label |
+| CS-EN-032 | warn | Emoji as a list bullet or heading prefix | An emoji at the start of a list line or heading |
+| CS-EN-033 | hint | Artificially friendly error or status message | "Oops!", "Uh-oh!", "Whoops!" |
+| CS-EN-034 | hint | Generic descriptive placeholder text | "Enter your text here", "Type something..." |
 
-## Markdown dan dokumen
+## Markdown and documents
 
-| ID | Tingkat | Pola | Deteksi |
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-EN-040 | hint | Judul di setiap paragraf pendek | Lebih dari satu judul per 80 kata |
-| CS-EN-041 | hint | Cetak tebal berlebihan | Lebih dari lima `**...**` per 150 kata |
-| CS-EN-042 | hint | Poin daftar berawalan label tebal berpola seragam | Lebih dari empat `- **Label:** deskripsi` berurutan |
-| CS-EN-043 | warn | Bagian README/dokumen berisi lencana dan emoji tanpa isi | Baris dominan lencana atau emoji di awal README |
+| CS-EN-040 | hint | A heading on every short paragraph | Not implemented |
+| CS-EN-041 | hint | Excess bold text | Not implemented |
+| CS-EN-042 | hint | Bullets that all start with a uniform bold label | Not implemented |
+| CS-EN-043 | warn | README section made of badges and emoji with no content | Not implemented |
 
-## Cara memperbaiki
+## How to fix
 
-1. Hapus kalimat yang tidak membawa fakta spesifik.
-2. Ganti klaim dengan fakta yang bisa diverifikasi dari proyek (fitur nyata, angka dari data, nama sebenarnya). Jika tidak ada, hapus klaimnya.
-3. Tulis dengan kata kerja konkret dan subjek yang jelas, sesuai nada di `DIRECTION.md`.
-4. Jalankan ulang `scan --only en`.
+1. Delete sentences that carry no specific fact.
+2. Replace claims with facts that can be verified from the project (real features, figures from data, real names). If there are none, delete the claim.
+3. Write with concrete verbs and a clear subject, matching the tone in `DIRECTION.md`.
+4. Rescan with `scan --only en`.
 
-## Pengecualian sah
+## Valid exceptions
 
-Catat di `.clearslop/allow.json` dengan alasan bila: frasa dikutip dari sumber lain, frasa menjadi nama produk atau merek, atau teks adalah contoh dalam dokumentasi tentang slop itu sendiri.
+Record an entry in `.clearslop/allow.json` with a reason when: the phrase is quoted from another source, the phrase is a product or brand name, or the text is an example in documentation about slop itself.

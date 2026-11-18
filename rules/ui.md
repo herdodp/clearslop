@@ -1,76 +1,78 @@
-<!-- clearslop-ignore-file: berkas ini memuat pola pemicu sebagai contoh -->
-# Aturan UI (CS-UI)
+<!-- clearslop-ignore-file: this file lists trigger patterns as examples -->
+# UI rules (CS-UI)
 
-Aturan ini menolak pola visual yang muncul karena kebiasaan, bukan karena kebutuhan produk. Setiap aturan punya ID, tingkat, dan cara deteksi. Tingkat: `block` (harus diperbaiki), `warn` (perbaiki kecuali ada alasan tercatat), `hint` (saran).
+These rules reject visual patterns that appear out of habit rather than product need. Each rule has an ID, a level, and a detection method. Levels: `block` (must be fixed), `warn` (fix unless there is a recorded reason), `hint` (suggestion).
 
-Prinsip: aturan ini hanya menolak. Karakter visual datang dari `.clearslop/DIRECTION.md`, bukan dari file ini.
+Principle: these rules only reject. Visual character comes from `.clearslop/DIRECTION.md`, not from this file.
 
-## Warna dan latar
+The scanner implements only some of these rules. Run `explain <RULE_ID>` to check whether a rule has a detector. Rules marked "render only" need a rendered page and are not implemented yet.
 
-| ID | Tingkat | Pola | Deteksi |
+## Color and background
+
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-UI-001 | warn | Gradien ungu-ke-biru atau ungu-ke-pink sebagai latar utama atau teks judul | `linear-gradient` dengan hue 250-320 pada dua stop atau lebih; kelas Tailwind `from-purple-*`/`from-violet-*` bersama `to-blue-*`/`to-pink-*`/`to-indigo-*` |
-| CS-UI-002 | warn | Gradien pada teks judul (`bg-clip-text` + `text-transparent`) | Kombinasi `background-clip: text` dan warna transparan, atau kelas `bg-clip-text` + `text-transparent` |
-| CS-UI-003 | warn | Glow dekoratif: bayangan berwarna dengan blur besar tanpa fungsi | `box-shadow`/`drop-shadow` dengan blur >= 24px dan warna non-netral (saturasi tinggi); kelas `shadow-*-500/50` ke atas |
-| CS-UI-004 | hint | Blob buram di latar (lingkaran besar blur sebagai dekorasi) | Elemen `absolute` dengan `blur-3xl`/`filter: blur(>=60px)` dan `rounded-full` |
-| CS-UI-005 | warn | Lebih dari dua warna aksen jenuh pada satu layar | Hitung hue unik (jenuh > 60%) pada token dan kelas warna di satu berkas; > 2 memicu |
-| CS-UI-006 | hint | Mode gelap otomatis `#0f172a`/`slate-900` tanpa alasan produk | Nilai latar tepat `#0f172a`, `#111827`, `bg-slate-900`, `bg-gray-900` sebagai latar body |
+| CS-UI-001 | warn | Purple-to-blue or purple-to-pink gradient as the main background or heading text | A CSS gradient (single or multi-line) with two or more colors, at least one with hue 250-320; Tailwind `from-purple-*`/`from-violet-*`/`from-fuchsia-*` followed by `to-blue-*`/`to-pink-*`/`to-indigo-*` |
+| CS-UI-002 | warn | Gradient on heading text (`bg-clip-text` + `text-transparent`) | `background-clip: text`, or the classes `bg-clip-text` and `text-transparent` together |
+| CS-UI-003 | warn | Decorative glow: a saturated colored shadow with a large blur and no function | `box-shadow`/`drop-shadow` with blur >= 24px and a saturated color (hex, rgb or hsl), on one or several lines; Tailwind `shadow-<color>-*/<opacity>` |
+| CS-UI-004 | hint | Blurred background blob used as decoration | `blur-3xl` or `filter: blur(>=60px)` |
+| CS-UI-005 | warn | More than two saturated accent colors on one screen | Not implemented. Count unique saturated hues in tokens and color classes of one file |
+| CS-UI-006 | hint | Automatic dark mode `#0f172a`/`slate-900` with no product reason | Exactly `#0f172a`, `#111827`, `bg-slate-900`, or `bg-gray-900` |
 
-## Tipografi
+## Typography
 
-| ID | Tingkat | Pola | Deteksi |
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-UI-010 | hint | Satu keluarga font bawaan untuk semua (Inter/Roboto/system-ui) tanpa kontras antara judul dan isi | `font-family` hanya berisi Inter, Roboto, atau `system-ui` di seluruh berkas gaya |
-| CS-UI-011 | warn | Ukuran judul hero berlebihan dengan `tracking-tight` pada semua judul | Lebih dari tiga elemen `h1`-`h3` dengan `tracking-tight`/`letter-spacing` negatif yang sama |
-| CS-UI-012 | warn | Huruf kapital semua pada label kecil di mana-mana (`uppercase tracking-wider` sebagai gaya default) | Lebih dari tiga kemunculan `uppercase` dengan `tracking-wide`/`tracking-wider`/`tracking-widest` |
-| CS-UI-013 | warn | Teks pudar sulit dibaca (kontras rendah) | Rasio kontras teks terhadap latar < 4.5:1 untuk teks biasa, < 3:1 untuk teks besar (butuh nilai warna eksplisit; hanya diperiksa bila kedua warna terbaca) |
+| CS-UI-010 | hint | One default font family for everything (Inter/Roboto/system-ui) with no contrast between headings and body | Not implemented |
+| CS-UI-011 | warn | Oversized hero heading with `tracking-tight` on every heading | Not implemented |
+| CS-UI-012 | warn | Uppercase small labels everywhere (`uppercase tracking-wider` as the default style) | Four or more lines combining `uppercase` with `tracking-wide`/`tracking-wider`/`tracking-widest` |
+| CS-UI-013 | warn | Faint, low-contrast text | Not implemented (render only). Contrast ratio below 4.5:1 for body text, 3:1 for large text |
 
-## Ikon, emoji, dan lencana
+## Icons, emoji, and badges
 
-| ID | Tingkat | Pola | Deteksi |
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-UI-020 | block | Emoji sebagai ikon fungsional atau penanda fitur dalam judul, tombol, atau daftar | Karakter emoji pada awal `li`, `h1`-`h4`, `button`, atau `label`; kecuali di dalam konten pengguna |
-| CS-UI-021 | warn | Lencana "baru/beta/AI-powered" sebagai pil di atas judul hero | Elemen pil kecil (`rounded-full` + teks pendek) tepat sebelum `h1` yang berisi `new`, `beta`, `AI`, `2.0`, `baru`, `ber-AI` |
-| CS-UI-022 | warn | Ikon berkilau (sparkle) sebagai logo atau penanda AI generik | Nama ikon `sparkles`, `wand`, `stars` atau emoji berkilau pada area logo/nav |
-| CS-UI-023 | hint | Kartu fitur tiga kolom dengan ikon bulat berwarna di atas judul pendek | Tiga atau lebih kartu sibling, masing-masing dengan wadah ikon `rounded-full`/`rounded-xl` berlatar warna lembut |
+| CS-UI-020 | warn | Emoji used as a functional icon or feature marker in a heading, button, label, or list item | An emoji character (emoji presentation, not text symbols such as Â©, Â®, â„¢, arrows) at the start of `li`, `h1`-`h4`, `button`, or `label` content |
+| CS-UI-021 | warn | "New/beta/AI-powered" pill above the hero heading | A `rounded-full` element with short text such as `new`, `beta`, `AI-powered`, `2.0` |
+| CS-UI-022 | warn | Sparkle icon as a generic AI marker or logo | `<Sparkles>`, `data-lucide="sparkles"`, `sparkles-icon`, or the sparkle emoji |
+| CS-UI-023 | hint | Three-column feature cards with a colored round icon above a short heading | Not implemented |
 
-## Layout dan spasi
+## Layout and spacing
 
-| ID | Tingkat | Pola | Deteksi |
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-UI-030 | warn | Semua sudut memakai radius besar yang sama (`rounded-2xl` di setiap elemen) | Lebih dari lima `rounded-2xl`/`rounded-3xl` dengan nilai identik dalam satu berkas |
-| CS-UI-031 | hint | Nilai spasi acak di luar skala (mis. 13px, 7px, 22px) | Nilai `px` pada `margin`/`padding`/`gap` yang bukan kelipatan 4 |
-| CS-UI-032 | warn | Semuanya di tengah: seluruh section `text-center` tanpa pengecualian | Lebih dari tiga section dengan `text-center`/`text-align: center` pada wadah utama |
-| CS-UI-033 | hint | Kartu bersarang kartu (kartu dalam kartu, masing-masing berbayang dan berbingkai) | Elemen dengan border + shadow + radius yang berisi anak dengan ketiganya |
-| CS-UI-034 | warn | Overflow horizontal pada lebar layar kecil | Hanya lewat verifikasi render (`--render`): `scrollWidth > clientWidth` pada lebar 360 dan 390 |
-| CS-UI-035 | warn | Target sentuh < 44x44px pada kontrol utama | Hanya lewat verifikasi render: ukuran terhitung `button`, `a`, `input` pada lebar 390 |
+| CS-UI-030 | warn | The same large radius on every element (`rounded-2xl` everywhere) | Six or more lines with `rounded-2xl`/`rounded-3xl` in one file |
+| CS-UI-031 | hint | Random spacing values outside the scale (13px, 7px, 22px) | Not implemented |
+| CS-UI-032 | warn | Everything centered: every section `text-center` | Four or more lines with `text-center`/`text-align: center` in one file |
+| CS-UI-033 | hint | Cards nested in cards, each with shadow and border | Not implemented |
+| CS-UI-034 | warn | Horizontal overflow on small screens | Render only: `scrollWidth > clientWidth` at 360 and 390 px |
+| CS-UI-035 | warn | Touch targets below 44x44 px on primary controls | Render only: computed size of `button`, `a`, `input` at 390 px |
 
-## Gerak dan dekorasi
+## Motion and decoration
 
-| ID | Tingkat | Pola | Deteksi |
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-UI-040 | warn | Animasi masuk generik pada semua elemen (fade-up seragam) | Kelas/animasi `fade-in`/`animate-fade-in-up` pada lebih dari lima elemen |
-| CS-UI-041 | hint | Animasi tanpa menghormati `prefers-reduced-motion` | Ada `animation`/`transition` panjang (> 300ms) tetapi tidak ada media query `prefers-reduced-motion` di proyek |
-| CS-UI-042 | hint | Elemen mengambang/berdenyut tanpa fungsi (`animate-pulse`, `animate-bounce` dekoratif) | `animate-pulse`/`animate-bounce` pada elemen non-loading |
-| CS-UI-043 | hint | Latar pola grid/titik/noise sebagai pengisi kosong | Gambar latar `radial-gradient` berulang kecil atau SVG grid sebagai latar section |
+| CS-UI-040 | warn | Generic entrance animation on every element (uniform fade-up) | Six or more lines with `fade-in`, `fade-up`, or `animate-fade` in one file |
+| CS-UI-041 | hint | Animation that ignores `prefers-reduced-motion` | Not implemented |
+| CS-UI-042 | hint | Decorative floating or pulsing elements | `animate-pulse`/`animate-bounce` on a line that is not a skeleton, loading, or spinner |
+| CS-UI-043 | hint | Grid, dot, or noise background pattern used as filler | Not implemented |
 
-## Konten palsu pada UI
+## Fake content on the page
 
-| ID | Tingkat | Pola | Deteksi |
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-UI-050 | block | Statistik atau metrik karangan pada halaman pemasaran ("10,000+ pengguna", "99.9% uptime", "0.0001ms") | Angka besar + satuan di dekat kata `users`, `uptime`, `latency`, `pengguna`, `ROI`, tanpa sumber data atau variabel |
-| CS-UI-051 | block | Testimoni dengan nama, jabatan, atau avatar karangan | Blok testimoni berisi nama generik ("John Doe", "Jane Smith", "Sarah Johnson") atau avatar placeholder |
-| CS-UI-052 | block | Logo "dipercaya oleh" tanpa klien nyata | Bagian `trusted by` / `dipercaya oleh` dengan logo placeholder atau nama perusahaan generik (Acme, Globex, Initech) |
-| CS-UI-053 | warn | Teks isian sisa (lorem ipsum, "Your text here", "Judul di sini") | Kecocokan literal |
-| CS-UI-054 | warn | Terminal/kode palsu sebagai pajangan yang berisi keluaran karangan | Blok mirip terminal dengan keluaran statis yang tidak berasal dari produk |
+| CS-UI-050 | warn | Invented statistics or metrics on a marketing page ("10,000+ users", "99.9% uptime", "0.0001ms") | A large number next to `users`, `customers`, `downloads`, `uptime`, or `latency`. Real, sourced figures belong in `allow.json` with a reason |
+| CS-UI-051 | block | Testimonial with an invented name, title, or avatar | Generic names such as "John Doe", "Jane Smith", "Sarah Johnson" |
+| CS-UI-052 | warn | "Trusted by" logos with no real clients | Generic company names: Acme, Globex, Initech |
+| CS-UI-053 | warn | Leftover placeholder text | Literal match: "lorem ipsum", "your text here", "your title here" |
+| CS-UI-054 | warn | Fake terminal or code shown as decoration, with invented output | Not implemented |
 
-## Cara memperbaiki (urutan)
+## How to fix (in order)
 
-1. Hapus dulu yang tidak punya fungsi (blob, glow, lencana, ikon bulat).
-2. Ganti konten palsu dengan konten nyata dari proyek, atau hapus bagiannya. Jangan membuat angka pengganti.
-3. Terapkan warna, font, dan momen aksen dari `DIRECTION.md`.
-4. Rapikan spasi ke skala tetap (kelipatan 4 atau 8) dan jalankan ulang `scan`.
+1. Remove what has no function first: blobs, glows, badges, round icon containers.
+2. Replace fake content with real content from the project, or delete the section. Never write replacement numbers.
+3. Apply the colors, fonts, and accent moments from `DIRECTION.md`.
+4. Tidy spacing to a fixed scale (multiples of 4 or 8) and rescan.
 
-## Pengecualian sah
+## Valid exceptions
 
-Tambahkan ke `.clearslop/allow.json` dengan alasan bila: gradien memang bagian identitas merek yang disetujui, emoji adalah konten pengguna, atau angka berasal dari data nyata yang terhubung. Alasan wajib diisi.
+Add an entry to `.clearslop/allow.json` with a reason when: a gradient is an approved part of the brand identity, an emoji is user content, or a figure comes from real connected data. The reason is mandatory.

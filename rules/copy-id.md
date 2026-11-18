@@ -1,71 +1,75 @@
-<!-- clearslop-ignore-file: berkas ini memuat frasa pemicu sebagai contoh -->
-# Aturan Teks Bahasa Indonesia (CS-ID)
+<!-- clearslop-ignore-file: this file lists trigger phrases as examples -->
+# Indonesian copy rules (CS-ID)
 
-Aturan ini menolak pola tulisan berbahasa Indonesia yang terdengar seperti keluaran AI generik: terjemahan kaku dari bahasa Inggris, hype, dan kalimat yang bisa ditempel ke produk apa pun. Tingkat: `block`, `warn`, `hint`.
+These rules detect generic AI-style writing in Indonesian: stiff translation from English, hype, and sentences that could be pasted onto any product. Levels: `block`, `warn`, `hint`.
 
-Prinsip: tulisan Indonesia yang baik terdengar seperti orang yang menulisnya langsung dalam bahasa Indonesia, bukan seperti terjemahan. Jika sebuah kalimat tidak memuat hal spesifik dan benar tentang produk, hapus.
+The trigger phrases below are Indonesian on purpose, because they are the text the scanner looks for. Each table gives an English gloss of the pattern. All explanations are in English.
 
-## Pembuka dan penutup generik
+Principle: good Indonesian copy sounds like it was written in Indonesian, not translated. If a sentence says nothing specific and true about the product, delete it.
 
-| ID | Tingkat | Pola | Contoh pemicu |
+The scanner implements only some of these rules. Run `explain <RULE_ID>` to check whether a rule has a detector. Phrases match case-insensitively on whole words.
+
+## Generic openers and closers
+
+| ID | Level | Pattern | Trigger examples |
 |---|---|---|---|
-| CS-ID-001 | warn | Pembuka era/zaman | "Di era digital ini", "Di era modern saat ini", "Dalam dunia yang serba cepat", "Di tengah perkembangan teknologi yang pesat" |
-| CS-ID-002 | warn | Penutup rangkuman kosong | "Kesimpulannya,", "Sebagai kesimpulan,", "Secara keseluruhan," di awal paragraf penutup |
-| CS-ID-003 | warn | Ajakan klise | "Siap membawa bisnis Anda ke level berikutnya?", "Mulai perjalanan Anda hari ini", "Wujudkan impian Anda bersama kami" |
-| CS-ID-004 | hint | Basa-basi pembuka balasan | "Tentu saja!", "Pertanyaan yang bagus!", "Dengan senang hati saya akan membantu", "Baik, mari kita mulai" |
-| CS-ID-005 | warn | Ajakan eksplorasi generik | "Mari kita eksplorasi", "Mari kita selami", "Mari kita bahas lebih dalam", "Yuk, kita kupas tuntas" |
+| CS-ID-001 | warn | Generic era opener ("in this digital era") | "di era digital", "di era modern", "dalam dunia yang serba cepat", "di tengah perkembangan teknologi" |
+| CS-ID-002 | warn | Empty summary closer | "kesimpulannya,", "sebagai kesimpulan,", "secara keseluruhan," |
+| CS-ID-003 | warn | Cliche call to action ("take your business to the next level") | "ke level berikutnya", "mulai perjalanan anda", "wujudkan impian anda" |
+| CS-ID-004 | hint | Pleasantry opener in a reply ("great question", "happy to help") | "pertanyaan yang bagus", "dengan senang hati saya akan membantu", "tentu saja!" |
+| CS-ID-005 | warn | Generic exploration invitation ("let's explore", "let's dive in") | "mari kita eksplorasi", "mari kita selami", "mari kita bahas lebih dalam", "kita kupas tuntas" |
 
-## Kosakata hype dan kata isian
+## Hype vocabulary and filler
 
-| ID | Tingkat | Pola | Contoh pemicu |
+| ID | Level | Pattern | Trigger examples |
 |---|---|---|---|
-| CS-ID-010 | warn | Superlatif tanpa bukti | "revolusioner", "terdepan", "terbaik di kelasnya", "kelas dunia", "inovatif", "canggih", "mutakhir" |
-| CS-ID-011 | warn | Kata kerja berlebihan | "memberdayakan", "mengoptimalkan", "memaksimalkan", "merevolusi", "menghadirkan solusi", "mengakselerasi" |
-| CS-ID-012 | warn | Klaim universal | "untuk semua kebutuhan Anda", "solusi satu pintu", "segala yang Anda butuhkan", "cocok untuk siapa saja" |
-| CS-ID-013 | block | Klaim angka tanpa sumber | "10x lebih cepat", "akurasi 99%", "hemat waktu berjam-jam" tanpa data atau tautan |
-| CS-ID-014 | hint | Frasa pengisi yang menunda isi | "Perlu diketahui bahwa", "Penting untuk dicatat bahwa", "Tak dapat dipungkiri bahwa", "Tidak bisa dipungkiri" |
-| CS-ID-015 | hint | Kata "AI-favorit" dalam tulisan Indonesia | "lanskap", "ekosistem" tanpa objek jelas, "sinergi", "holistik", "komprehensif", "paradigma baru", "transformasi digital" |
+| CS-ID-010 | warn | Superlative without evidence ("revolutionary", "world class", "cutting edge") | "revolusioner", "terdepan", "terbaik di kelasnya", "kelas dunia", "mutakhir" |
+| CS-ID-011 | warn | Inflated verb ("empower", "optimize", "maximize", "accelerate") | "memberdayakan", "mengoptimalkan", "memaksimalkan", "merevolusi", "menghadirkan solusi", "mengakselerasi" |
+| CS-ID-012 | warn | Universal claim ("for all your needs", "one-stop solution") | "untuk semua kebutuhan anda", "solusi satu pintu", "segala yang anda butuhkan", "cocok untuk siapa saja" |
+| CS-ID-013 | warn | Unsourced numeric claim ("10x faster", "99% accuracy") | "10x lebih cepat", "akurasi 99%", "hemat waktu berjam-jam" with no data or link. A sourced figure belongs in `allow.json` with a reason |
+| CS-ID-014 | hint | Filler phrase that delays the content ("it should be noted that") | "perlu diketahui bahwa", "penting untuk dicatat bahwa", "tak dapat dipungkiri", "tidak bisa dipungkiri" |
+| CS-ID-015 | hint | Favorite AI words in Indonesian ("holistic", "synergy", "new paradigm") | "holistik", "sinergi", "paradigma baru", "transformasi digital", "komprehensif" |
 
-## Terjemahan kaku dan struktur kalimat
+## Stiff translation and sentence structure
 
-| ID | Tingkat | Pola | Deteksi |
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-ID-020 | warn | Kontras "bukan hanya X, tetapi juga Y" berulang | "Bukan hanya ... tetapi juga", "Tidak hanya ... melainkan" lebih dari dua kali per dokumen |
-| CS-ID-021 | warn | Tiga serangkai paksa | "cepat, mudah, dan andal" berirama lebih dari dua kali per dokumen |
-| CS-ID-022 | warn | Kalimat pasif berantai ("dapat dilakukan", "dapat digunakan", "dapat diakses") | Lebih dari tiga "dapat di-" per 200 kata |
-| CS-ID-023 | warn | Terjemahan harfiah dari idiom Inggris | "di akhir hari", "mengambil langkah mundur", "bola ada di tangan Anda", "mengubah permainan", "di luar kotak" |
-| CS-ID-024 | hint | Kata sambung berantai di awal kalimat | "Selain itu,", "Lebih lanjut,", "Di samping itu,", "Oleh karena itu," lebih dari tiga kali per dokumen |
-| CS-ID-025 | hint | Kalimat penjelas diri setelah setiap poin | "Artinya,", "Dengan kata lain,", "Singkatnya," lebih dari dua kali per dokumen |
-| CS-ID-026 | hint | Kalimat tanya retoris sebagai pembuka section | Baris pertama section diakhiri "?" lebih dari tiga kali per dokumen |
-| CS-ID-027 | warn | "Anda" berlebihan dan nada kaku pada produk yang ditujukan ke audiens santai | "Anda" lebih dari 8 kali per 150 kata, tidak sesuai nada di `DIRECTION.md` |
+| CS-ID-020 | warn | Repeated "not only X but also Y" contrast | "bukan hanya" or "tidak hanya" on three or more lines in one file |
+| CS-ID-021 | warn | Forced triplet ("fast, easy, and reliable") | Not implemented |
+| CS-ID-022 | warn | Chained passive constructions ("dapat dilakukan", "dapat digunakan") | Not implemented |
+| CS-ID-023 | warn | Literal translation of an English idiom | "di akhir hari" (end of the day), "langkah mundur" (step back), "bola ada di tangan" (the ball is in your court), "mengubah permainan" (game changer), "di luar kotak" (outside the box) |
+| CS-ID-024 | hint | Chained transition words at sentence starts | "selain itu,", "lebih lanjut,", "di samping itu,", "oleh karena itu," on four or more lines |
+| CS-ID-025 | hint | Self-explaining sentence after every point ("in other words", "in short") | "artinya,", "dengan kata lain,", "singkatnya," on three or more lines |
+| CS-ID-026 | hint | Rhetorical question opening a section | Not implemented |
+| CS-ID-027 | warn | Excess formal "Anda" in copy aimed at a casual audience | Not implemented |
 
-## Judul, tombol, dan mikroteks
+## Headings, buttons, and microcopy
 
-| ID | Tingkat | Pola | Deteksi |
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-ID-030 | warn | Judul kapital semua dengan tanda seru | Teks `h1`-`h3` atau tombol: huruf besar semua + "!" |
-| CS-ID-031 | warn | Tombol CTA generik | "Mulai Sekarang", "Pelajari Lebih Lanjut", "Klik Di Sini", "Kirim" sebagai satu-satunya label tombol utama |
-| CS-ID-032 | warn | Emoji sebagai poin daftar atau awalan judul | Emoji di awal baris daftar atau judul |
-| CS-ID-033 | hint | Pesan galat yang dibuat-buat ramah | "Ups!", "Oops!", "Waduh!", "Aduh!" tanpa informasi penyebab |
-| CS-ID-034 | hint | Placeholder generik | "Masukkan teks Anda di sini", "Ketik sesuatu...", "Judul di sini" |
-| CS-ID-035 | hint | Pesan galat tanpa tindakan lanjut | "Terjadi kesalahan." / "Terjadi kesalahan, silakan coba lagi nanti." tanpa penyebab atau langkah |
+| CS-ID-030 | warn | All-caps heading with an exclamation mark | Not implemented. The English rule `CS-EN-030` already matches all-caps headings and buttons |
+| CS-ID-031 | warn | Generic CTA button ("Start now", "Learn more", "Click here", "Send") | "mulai sekarang", "pelajari lebih lanjut", "klik di sini", "kirim" as a button label |
+| CS-ID-032 | warn | Emoji as a list bullet or heading prefix | Not implemented. The English rule `CS-EN-032` already matches this in any language |
+| CS-ID-033 | hint | Artificially friendly error message ("Oops!") | "ups!", "waduh!", "aduh!" |
+| CS-ID-034 | hint | Generic placeholder ("Enter your text here", "Heading here") | "masukkan teks anda di sini", "ketik sesuatu...", "judul di sini" |
+| CS-ID-035 | hint | Error message with no cause or next step ("An error occurred.") | "terjadi kesalahan." |
 
-## Campur bahasa dan ejaan
+## Mixed language and spelling
 
-| ID | Tingkat | Pola | Deteksi |
+| ID | Level | Pattern | Detection |
 |---|---|---|---|
-| CS-ID-040 | hint | Istilah Inggris tanpa perlu di tengah kalimat Indonesia | "leverage", "seamless", "scalable", "powerful", "user-friendly" padahal ada padanan biasa |
-| CS-ID-041 | hint | Judul Title Case Inggris pada teks Indonesia | Tiap kata berhuruf kapital pada judul berbahasa Indonesia ("Solusi Terbaik Untuk Bisnis Anda") |
-| CS-ID-042 | hint | Ketidakkonsistenan sapaan | Campuran "Anda", "kamu", "kalian", "Kakak" dalam satu dokumen |
+| CS-ID-040 | hint | Needless English terms inside Indonesian sentences | Not implemented. Examples: "leverage", "seamless", "scalable", "powerful", "user-friendly" |
+| CS-ID-041 | hint | English-style Title Case on Indonesian headings | Not implemented |
+| CS-ID-042 | hint | Inconsistent forms of address | Not implemented. Mixing "Anda", "kamu", "kalian" in one document |
 
-## Cara memperbaiki
+## How to fix
 
-1. Hapus kalimat yang tidak membawa fakta spesifik.
-2. Ganti klaim dengan fakta yang bisa diverifikasi dari proyek (fitur nyata, angka dari data, nama sebenarnya). Jika tidak ada, hapus klaimnya.
-3. Tulis dengan kata kerja aktif dan subjek jelas. Contoh: ganti "Fitur ini dapat digunakan untuk membuat laporan" dengan "Buat laporan dari satu tabel."
-4. Samakan sapaan dan nada dengan `DIRECTION.md`.
-5. Jalankan ulang `scan --only id`.
+1. Delete sentences that carry no specific fact.
+2. Replace claims with facts that can be verified from the project (real features, figures from data, real names). If there are none, delete the claim.
+3. Use active verbs and a clear subject. Example: replace "Fitur ini dapat digunakan untuk membuat laporan" ("This feature can be used to create reports") with "Buat laporan dari satu tabel." ("Build reports from a single table.")
+4. Keep the form of address and tone consistent with `DIRECTION.md`.
+5. Rescan with `scan --only id`.
 
-## Pengecualian sah
+## Valid exceptions
 
-Catat di `.clearslop/allow.json` dengan alasan bila: frasa dikutip dari sumber lain, frasa menjadi nama produk atau merek, atau teks adalah contoh dalam dokumentasi tentang slop itu sendiri.
+Record an entry in `.clearslop/allow.json` with a reason when: the phrase is quoted from another source, the phrase is a product or brand name, or the text is an example in documentation about slop itself.

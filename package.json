@@ -1,0 +1,17 @@
+{
+  "name": "clearslop",
+  "version": "0.2.0",
+  "description": "Deterministic AI-slop scanner for UI, copy (English and Indonesian), and code. Slop score, baseline, and ratchet for CI.",
+  "license": "MIT",
+  "private": true,
+  "bin": {
+    "clearslop": "scanner/clearslop.js"
+  },
+  "scripts": {
+    "test": "node --test test/clearslop.test.js",
+    "scan": "node scanner/clearslop.js scan ."
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
