@@ -17,7 +17,7 @@ Not just instructions for a model. Findings, scores, and exit codes come from a 
 
 ## What is slop
 
-Slop is a pattern that shows up out of AI-output habit, not product need: purple gradients, decorative glows, emoji used as icons, invented statistics, "in today's digital era" openers, comments that only restate the code.
+Slop is a pattern that shows up out of AI-output habit, not product need: purple gradients, decorative glows, emoji used as icons, invented statistics, "in today's digital era" openers, comments that only restate the code. <!-- clearslop-ignore: quoted as an example of slop -->
 
 clearslop rejects these patterns in a measurable way. Product character still comes from you, through `.clearslop/DIRECTION.md`, not from this tool.
 

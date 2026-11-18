@@ -176,3 +176,38 @@ test('output is deterministic', function () {
   const dir = project({ 'b.md': 'A revolutionary idea.\n', 'a.md': 'We unleash value.\n' });
   assert.deepStrictEqual(scanner.run('.', {}, dir), scanner.run('.', {}, dir));
 });
+
+test('low contrast pair is flagged, a passing pair is not', function () {
+  const low = project({ 'a.css': '.x { color: #777777; background: #ffffff; }\n' });
+  assert.ok(ids(scanner.run('.', {}, low)).indexOf('CS-UI-060') !== -1);
+  const ok = project({ 'a.css': '.x { color: #000000; background: #ffffff; }\n' });
+  assert.ok(ids(scanner.run('.', {}, ok)).indexOf('CS-UI-060') === -1);
+});
+
+test('image rules flag missing alt and size, and pass a complete tag', function () {
+  const bad = project({ 'a.html': '<img src="a.png">\n' });
+  const badIds = ids(scanner.run('.', {}, bad));
+  assert.ok(badIds.indexOf('CS-UI-061') !== -1);
+  assert.ok(badIds.indexOf('CS-UI-062') !== -1);
+  const good = project({ 'a.html': '<img src="a.png" alt="Chart" width="10" height="10">\n' });
+  const goodIds = ids(scanner.run('.', {}, good));
+  assert.ok(goodIds.indexOf('CS-UI-061') === -1);
+  assert.ok(goodIds.indexOf('CS-UI-062') === -1);
+});
+
+test('clickable div and dead link are flagged', function () {
+  const dir = project({ 'a.html': '<div onclick="go()">Go</div>\n<a href="#">More</a>\n' });
+  const found = ids(scanner.run('.', {}, dir));
+  assert.ok(found.indexOf('CS-UI-066') !== -1);
+  assert.ok(found.indexOf('CS-UI-067') !== -1);
+});
+
+test('em dash is flagged in copy', function () {
+  const dir = project({ 'a.md': 'This is fast \u2014 and simple.\n' });
+  assert.ok(ids(scanner.run('.', {}, dir)).indexOf('CS-EN-040') !== -1);
+});
+
+test('workflow narration comment is flagged', function () {
+  const dir = project({ 'a.js': '// Step 1: load the data\nconst x = load();\n' });
+  assert.ok(ids(scanner.run('.', {}, dir)).indexOf('CS-CD-009') !== -1);
+});

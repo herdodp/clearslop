@@ -270,6 +270,198 @@ lineRule('CS-CD-027', 'code', 'hint', 'Leftover debug console.log', function (l,
   return /^\s*console\.log\(/.test(l);
 });
 
+// Rules ported from the antislop rulebook, plus checks that only a machine can repeat exactly.
+const HTML_EXT = ['.html', '.htm'];
+const MARKUP_EXT = ['.html', '.htm', '.jsx', '.tsx', '.vue', '.svelte'];
+const STYLE_EXT = ['.css', '.scss', '.html', '.htm', '.vue', '.svelte'];
+
+function hexRgb(tok) {
+  const t = String(tok).trim().toLowerCase();
+  if (t === 'white') return [255, 255, 255];
+  if (t === 'black') return [0, 0, 0];
+  const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/.exec(t);
+  if (!m) return null;
+  let h = m[1];
+  if (h.length === 3) h = h.split('').map(function (c) { return c + c; }).join('');
+  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+}
+function lum(rgb) {
+  const c = rgb.map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+function contrastRatio(a, b) {
+  const x = lum(a);
+  const y = lum(b);
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}
+// WCAG AA check for one declaration block that sets both a text color and a background color.
+function declContrast(decl) {
+  const fg = /(?:^|[;\s{\x22\x27])color\s*:\s*(#[0-9a-fA-F]{3,6}\b|white\b|black\b)/i.exec(decl);
+  const bg = /background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3,6}\b|white\b|black\b)/i.exec(decl);
+  if (!fg || !bg) return null;
+  const a = hexRgb(fg[1]);
+  const b = hexRgb(bg[1]);
+  if (!a || !b) return null;
+  const size = /font-size\s*:\s*(\d+(?:\.\d+)?)px/i.exec(decl);
+  return { ratio: contrastRatio(a, b), need: size && parseFloat(size[1]) >= 24 ? 3 : 4.5 };
+}
+
+fileRule('CS-UI-060', 'ui', 'warn', 'Text contrast below WCAG AA', function (text) {
+  const hits = [];
+  let m;
+  const block = /\{([^{}]*)\}/g;
+  while ((m = block.exec(text)) !== null) {
+    const r = declContrast(m[1]);
+    if (r && r.ratio < r.need) hits.push(lineAt(text, m.index));
+  }
+  const inline = /style\s*=\s*\x22([^\x22]*)\x22/g;
+  while ((m = inline.exec(text)) !== null) {
+    const r = declContrast(m[1]);
+    if (r && r.ratio < r.need) hits.push(lineAt(text, m.index));
+  }
+  return hits;
+}, { exts: STYLE_EXT });
+lineRule('CS-UI-061', 'ui', 'warn', 'Image, video or iframe without width and height', function (l) {
+  const m = /<(img|video|iframe)\b[^>]*>/i.exec(l);
+  if (!m) return false;
+  const t = m[0];
+  if (/aspect-ratio|\bw-|\bh-|\bsize-/.test(t)) return false;
+  return !(/\bwidth\s*=/.test(t) && /\bheight\s*=/.test(t));
+}, { exts: MARKUP_EXT });
+lineRule('CS-UI-062', 'ui', 'warn', 'Image without alt text', function (l) {
+  const m = /<img\b[^>]*>/i.exec(l);
+  return !!m && !/\balt\s*=|\{\.\.\./.test(m[0]);
+}, { exts: MARKUP_EXT });
+lineRule('CS-UI-063', 'ui', 'warn', 'Hero image loaded lazily', function (l) {
+  return /<img\b[^>]*loading\s*=\s*[\x22\x27]lazy[\x22\x27]/i.test(l) && /hero|banner|above-the-fold|lcp/i.test(l);
+}, { exts: MARKUP_EXT });
+fileRule('CS-UI-064', 'ui', 'warn', 'Render-blocking script in head', function (text) {
+  const hits = [];
+  const head = /<head\b[\s\S]*?<\/head>/i.exec(text);
+  if (!head) return hits;
+  const re = /<script\b[^>]*\bsrc\s*=[^>]*>/gi;
+  let m;
+  while ((m = re.exec(head[0])) !== null) {
+    if (!/\b(defer|async)\b|type\s*=\s*[\x22\x27]module/i.test(m[0])) hits.push(lineAt(text, head.index + m.index));
+  }
+  return hits;
+}, { exts: HTML_EXT });
+lineRule('CS-UI-065', 'ui', 'warn', 'Focus outline removed with no replacement', function (l, lines, i) {
+  if (!/outline\s*:\s*(none|0)\b|outline-none/.test(l)) return false;
+  const near = lines.slice(Math.max(0, i - 3), i + 4).join('\n');
+  return !/box-shadow|ring-|border|outline\s*:\s*[1-9]/.test(near);
+});
+lineRule('CS-UI-066', 'ui', 'warn', 'Clickable div or span instead of a button', function (l) {
+  return /<(div|span|li)\b[^>]*\b(onClick|onclick|@click|v-on:click)\s*=/.test(l) && !/role\s*=\s*[\x22\x27]button/.test(l);
+}, { exts: MARKUP_EXT });
+lineRule('CS-UI-067', 'ui', 'warn', 'Link that goes nowhere', function (l) {
+  return /<a\b[^>]*href\s*=\s*[\x22\x27](#|javascript:[^\x22\x27]*)[\x22\x27]/i.test(l);
+}, { exts: MARKUP_EXT });
+fileRule('CS-UI-068', 'ui', 'warn', 'Link to a section that does not exist', function (text) {
+  const ids = new Set();
+  let m;
+  const idRe = /\b(?:id|name)\s*=\s*[\x22\x27]([^\x22\x27]+)[\x22\x27]/g;
+  while ((m = idRe.exec(text)) !== null) ids.add(m[1]);
+  const hits = [];
+  const hrefRe = /href\s*=\s*[\x22\x27]#([A-Za-z][\w:.-]*)[\x22\x27]/g;
+  while ((m = hrefRe.exec(text)) !== null) if (!ids.has(m[1])) hits.push(lineAt(text, m.index));
+  return hits;
+}, { exts: HTML_EXT });
+lineRule('CS-UI-069', 'ui', 'warn', 'Icon-only button without an accessible name', function (l) {
+  return /<button\b(?![^>]*(?:aria-label|aria-labelledby|title)\s*=)[^>]*>\s*(?:<svg\b[\s\S]*?<\/svg>|<i\b[^>]*>\s*<\/i>)\s*<\/button>/i.test(l);
+}, { exts: MARKUP_EXT });
+lineRule('CS-UI-070', 'ui', 'warn', 'Viewport blocks zooming', function (l) {
+  return /user-scalable\s*=\s*(no|0)|maximum-scale\s*=\s*1(?:\.0)?\b/i.test(l);
+}, { exts: HTML_EXT });
+fileRule('CS-UI-071', 'ui', 'warn', 'Page without a lang attribute', function (text) {
+  const m = /<html\b[^>]*>/i.exec(text);
+  return m && !/\blang\s*=/i.test(m[0]) ? [lineAt(text, m.index)] : [];
+}, { exts: HTML_EXT });
+fileRule('CS-UI-072', 'ui', 'warn', 'Animation without prefers-reduced-motion', function (text) {
+  if (/prefers-reduced-motion/.test(text)) return [];
+  const m = /@keyframes\b|animation(?:-name)?\s*:/.exec(text);
+  return m ? [lineAt(text, m.index)] : [];
+}, { exts: STYLE_EXT });
+lineRule('CS-UI-073', 'ui', 'hint', 'Full-viewport section height', function (l) {
+  return /(?:^|[\s:;])(?:min-)?height\s*:\s*100vh\b|\bmin-h-screen\b|\bh-screen\b/.test(l);
+});
+lineRule('CS-UI-074', 'ui', 'hint', 'Grid with fixed pixel columns', function (l) {
+  return /grid-template-columns\s*:[^;]*\b\d{3,4}px/.test(l) && !/minmax|auto-fit|auto-fill|\d+fr/.test(l);
+});
+lineRule('CS-UI-075', 'ui', 'hint', 'Decorative background grid or dot pattern', function (l) {
+  return /\bbg-grid\b|grid-pattern|bg-\[size:|background-size\s*:\s*\d+px\s+\d+px/i.test(l);
+});
+fileRule('CS-UI-076', 'ui', 'hint', 'Fake terminal window', function (text) {
+  const m = /traffic-?lights?|window-controls|terminal-dots|bg-red-[45]00[\s\S]{0,160}bg-yellow-[45]00[\s\S]{0,160}bg-green-[45]00/i.exec(text);
+  return m ? [lineAt(text, m.index)] : [];
+});
+lineRule('CS-UI-077', 'ui', 'hint', 'Colored left stripe on a card', function (l) {
+  return /border-l-[2-8]\s+border-(?:blue|purple|indigo|violet|pink|emerald|green|red|amber|cyan)-\d+/.test(l) || /border-left\s*:\s*[3-8]px\s+solid/i.test(l);
+});
+fileRule('CS-UI-078', 'ui', 'hint', 'Eyebrow badge above the headline', function (text) {
+  const m = /<(?:span|div|p)\b[^>]*rounded-full[^>]*>[^<]{1,40}<\/(?:span|div|p)>\s*<h1\b/i.exec(text);
+  return m ? [lineAt(text, m.index)] : [];
+}, { exts: MARKUP_EXT });
+countRule('CS-UI-079', 'ui', 'warn', 'Blur or glass effect on many elements', /backdrop-filter|backdrop-blur/, 4);
+countRule('CS-UI-080', 'ui', 'hint', 'Decorative arrow on many buttons', /(?:\u2192|\u2197|&rarr;)\s*<\/(?:button|a)>|<(?:button|a)\b[^>]*>[^<]*(?:\u2192|\u2197)/, 4);
+fileRule('CS-UI-081', 'ui', 'hint', 'Form field without a label', function (text) {
+  const hits = [];
+  const labelFor = new Set();
+  let m;
+  const lf = /<label\b[^>]*\b(?:for|htmlFor)\s*=\s*[\x22\x27{]+([^\x22\x27}]+)/g;
+  while ((m = lf.exec(text)) !== null) labelFor.add(m[1]);
+  const re = /<(input|textarea|select)\b[^>]*>/gi;
+  while ((m = re.exec(text)) !== null) {
+    const tag = m[0];
+    if (/type\s*=\s*[\x22\x27](hidden|submit|button|reset|image)/i.test(tag)) continue;
+    if (/aria-label|aria-labelledby|title\s*=|\{\.\.\./i.test(tag)) continue;
+    const id = /\bid\s*=\s*[\x22\x27]([^\x22\x27]+)/.exec(tag);
+    if (id && labelFor.has(id[1])) continue;
+    const before = text.slice(Math.max(0, m.index - 200), m.index);
+    if (before.lastIndexOf('<label') > before.lastIndexOf('</label>')) continue;
+    hits.push(lineAt(text, m.index));
+  }
+  return hits;
+}, { exts: MARKUP_EXT });
+
+// Copy rules from the antislop copywriting skill.
+lineRule('CS-EN-040', 'en', 'warn', 'Em dash in text', function (l) {
+  return l.indexOf('\u2014') !== -1;
+});
+phr('CS-EN-041', 'en', 'warn', 'Chatbot closer', ['i hope this helps', 'let me know if you', 'would you like me to', 'feel free to ask']);
+phr('CS-EN-042', 'en', 'hint', 'Fake-candid opener', ['honestly?', 'let\'s be honest', 'here\'s the thing', 'real talk']);
+phr('CS-EN-043', 'en', 'warn', 'Signposting announcement', ['let\'s dive', 'here\'s what you need to know', 'without further ado', 'in this article we\'ll']);
+phr('CS-EN-044', 'en', 'warn', 'Temporal runway cliche', ['in today\'s fast-paced', 'in today\'s digital', 'in today\'s world', 'in an increasingly']);
+phr('CS-EN-045', 'en', 'hint', 'Weasel attribution', ['experts say', 'industry observers', 'leading analysts', 'many believe']);
+phr('CS-EN-046', 'en', 'hint', 'Persuasive authority trope', ['at its core', 'the real question is', 'what really matters', 'the heart of the matter', 'the deeper issue']);
+phr('CS-EN-047', 'en', 'warn', 'Theatrical takeaway', ['read that again', 'let that sink in', 'the takeaway is simple', 'here\'s the bottom line', 'the message is clear']);
+phr('CS-EN-048', 'en', 'hint', 'Generic positive conclusion', ['the future looks bright', 'exciting times', 'step in the right direction']);
+phr('CS-EN-049', 'en', 'hint', 'Filler phrase', ['in order to', 'due to the fact that', 'at this point in time', 'it is important to note that']);
+lineRule('CS-EN-050', 'en', 'hint', 'Stacked hedging', function (l) {
+  return /\b(could potentially|may perhaps|might possibly|possibly maybe)\b/i.test(l);
+});
+
+// Comment and script hygiene from the antislop code skill.
+lineRule('CS-CD-009', 'code', 'warn', 'Workflow narration comment', function (l) {
+  return isComment(l) && /^(?:step\s*\d+\s*[:.)-]|(?:first|next|then|finally)\s*[,:.])/i.test(commentText(l));
+});
+lineRule('CS-CD-010', 'code', 'hint', 'End-of-block marker comment', function (l) {
+  if (/\}\s*(?:\/\/|#)\s*end\b/i.test(l)) return true;
+  return isComment(l) && /^end (?:of )?(?:function|class|file|if|for|loop|module|block)\b|^end [A-Za-z_]+$/i.test(commentText(l));
+});
+lineRule('CS-CD-011', 'code', 'hint', 'Empty label comment', function (l) {
+  return isComment(l) && /^(?:main|core|business) logic\.?$|^helper function\.?$|^entry point\.?$|^error handling\.?$|^note: this is important\.?$|^important: please read\.?$/i.test(commentText(l));
+});
+lineRule('CS-CD-012', 'code', 'hint', 'Vague TODO or placeholder comment', function (l) {
+  return isComment(l) && /\b(?:todo|fixme)\b:?\s*(?:improve this|add more[a-z ]*|optimi[sz]e(?: this)?|clean up|fix this)\.?\s*$|future improvements|can be added here/i.test(l);
+});
+lineRule('CS-CD-013', 'code', 'hint', 'Doc comment that only echoes the signature', function (l) {
+  return /@param\s+(?:\{[^}]*\}\s*)?(\w+)\s+(?:the\s+)?\1\.?\s*$/i.test(l);
+});
+lineRule('CS-CD-014', 'code', 'warn', 'Style file rewritten by a script', function (l) {
+  return /\.s?css[\x22\x27][^\n]*(?:\.replace\(|re\.sub\()|(?:\.replace\(|re\.sub\()[^\n]*\.s?css[\x22\x27]/.test(l);
+});
+
 module.exports = {
   RULES: RULES,
   EXT: EXT,
