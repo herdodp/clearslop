@@ -1,7 +1,7 @@
 {
   "name": "clearslop",
   "version": "0.2.0",
-  "description": "Deterministic AI-slop scanner for UI, copy (English and Indonesian), and code. Slop score, baseline, and ratchet for CI.",
+  "description": "Deterministic AI-slop scanner for UI, copy, and code. Slop score, baseline, and ratchet for CI.",
   "license": "MIT",
   "private": true,
   "bin": {

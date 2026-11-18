@@ -190,11 +190,11 @@ function parseArgs(argv) {
     else o.rest.push(a);
   }
   o.target = o.rest[0] || '.';
-  if (o.only) o.only.forEach(function (g) { if (!GROUP_EXT[g]) throw new UsageError('Invalid --only group: ' + g + ' (ui, en, id, code)'); });
+  if (o.only) o.only.forEach(function (g) { if (!GROUP_EXT[g]) throw new UsageError('Invalid --only group: ' + g + ' (ui, en, code)'); });
   return o;
 }
 
-const USAGE = 'clearslop ' + VERSION + '\nUsage:\n  init\n  scan [path] [--json] [--only ui,en,id,code]\n  baseline [path] [--only ...]\n  ratchet [path] [--only ...]\n  explain <RULE_ID>';
+const USAGE = 'clearslop ' + VERSION + '\nUsage:\n  init\n  scan [path] [--json] [--only ui,en,code]\n  baseline [path] [--only ...]\n  ratchet [path] [--only ...]\n  explain <RULE_ID>';
 
 // Returns an exit code. All output goes through console so tests can capture it.
 function main(argv, cwd) {

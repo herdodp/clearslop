@@ -1,11 +1,11 @@
 ---
 name: clearslop
-description: Use when the user asks to clear, audit, or prevent AI slop (generic UI, filler copy in English or Indonesian, AI-shaped code and comments) or mentions clearslop, slop score, or slop baseline. Runs a deterministic scanner, builds a project direction, fixes findings, and ratchets the score.
+description: Use when the user asks to clear, audit, or prevent AI slop (generic UI, filler copy, AI-shaped code and comments) or mentions clearslop, slop score, or slop baseline. Runs a deterministic scanner, builds a project direction, fixes findings, and ratchets the score.
 ---
 
 # clearslop
 
-clearslop removes AI "slop" from UI, copy (English and Indonesian), and code. Unlike instruction-only filters, **the check is done by a deterministic scanner, not by model judgment**. The model must not claim a pass without scanner output.
+clearslop removes AI "slop" from UI, copy, and code. Unlike instruction-only filters, **the check is done by a deterministic scanner, not by model judgment**. The model must not claim a pass without scanner output.
 
 Workflow: **Detect -> Direct -> Enforce -> Remember**.
 
@@ -15,7 +15,6 @@ Workflow: **Detect -> Direct -> Enforce -> Remember**.
 - `scanner/rules.js`: rule definitions used by the scanner.
 - `rules/ui.md`: UI and visual rules (`CS-UI-*`).
 - `rules/copy-en.md`: English copy rules (`CS-EN-*`).
-- `rules/copy-id.md`: Indonesian copy rules (`CS-ID-*`).
 - `rules/code.md`: code and comment rules (`CS-CD-*`).
 
 Read only the rule files relevant to the task. Do not load all of them at once.
@@ -26,7 +25,7 @@ Run from the workspace root. The paths below assume the skill is installed at `.
 
 ```
 node .snapgent/skills/clearslop/scanner/clearslop.js init
-node .snapgent/skills/clearslop/scanner/clearslop.js scan [path] [--json] [--only ui,en,id,code]
+node .snapgent/skills/clearslop/scanner/clearslop.js scan [path] [--json] [--only ui,en,code]
 node .snapgent/skills/clearslop/scanner/clearslop.js baseline [path] [--only ...]
 node .snapgent/skills/clearslop/scanner/clearslop.js ratchet [path] [--only ...]
 node .snapgent/skills/clearslop/scanner/clearslop.js explain <RULE_ID>

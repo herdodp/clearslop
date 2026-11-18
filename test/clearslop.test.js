@@ -32,9 +32,9 @@ function cli(args, cwd) {
 }
 
 test('phrases match whole words only', function () {
-  const dir = project({ 'a.md': 'These groups! are fine.\n', 'b.md': 'Ups! Something failed.\n' });
+  const dir = project({ 'a.md': 'The hoops! are fine.\n', 'b.md': 'Oops! Something failed.\n' });
   const r = scanner.run('.', {}, dir);
-  const hits = r.findings.filter(function (f) { return f.rule === 'CS-ID-033'; });
+  const hits = r.findings.filter(function (f) { return f.rule === 'CS-EN-033'; });
   assert.deepStrictEqual(hits.map(function (f) { return f.file; }), ['b.md']);
 });
 

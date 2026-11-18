@@ -8,8 +8,8 @@ const EXT = {
   text: ['.md', '.txt', '.html', '.htm', '.jsx', '.tsx', '.vue', '.svelte'],
   code: CODE_EXT
 };
-const GROUP_EXT = { ui: 'ui', en: 'text', id: 'text', code: 'code' };
-const RULE_DOC = { ui: 'rules/ui.md', en: 'rules/copy-en.md', id: 'rules/copy-id.md', code: 'rules/code.md' };
+const GROUP_EXT = { ui: 'ui', en: 'text', code: 'code' };
+const RULE_DOC = { ui: 'rules/ui.md', en: 'rules/copy-en.md', code: 'rules/code.md' };
 
 const WORD_BEFORE = /(?<![\p{L}\p{N}])/u.source;
 const WORD_AFTER = /(?![\p{L}\p{N}])/u.source;
@@ -165,7 +165,7 @@ lineRule('CS-UI-042', 'ui', 'hint', 'Decorative pulse or bounce animation', func
   return /animate-(pulse|bounce)/.test(l) && !/skeleton|loading|spinner/i.test(l);
 });
 lineRule('CS-UI-050', 'ui', 'warn', 'Invented statistics on the page', function (l) {
-  return /\b\d{1,3}(,\d{3})+\+?\s*(users|customers|pengguna|downloads|pelanggan)|99\.9+%\s*uptime|\d+(\.\d+)?\s*ms\s*latency/i.test(l);
+  return /\b\d{1,3}(,\d{3})+\+?\s*(users|customers|downloads)|99\.9+%\s*uptime|\d+(\.\d+)?\s*ms\s*latency/i.test(l);
 });
 phr('CS-UI-051', 'ui', 'block', 'Testimonial with an invented name', ['John Doe', 'Jane Smith', 'Sarah Johnson', 'Jane Doe']);
 phr('CS-UI-052', 'ui', 'warn', 'Placeholder client logo', ['Acme', 'Globex', 'Initech']);
@@ -197,31 +197,6 @@ lineRule('CS-EN-032', 'en', 'warn', 'Emoji as list bullet or heading prefix', fu
 });
 phr('CS-EN-033', 'en', 'hint', 'Artificially friendly error message', ['oops!', 'uh-oh!', 'whoops!']);
 phr('CS-EN-034', 'en', 'hint', 'Generic placeholder text', ['enter your text here', 'type something...']);
-
-// Indonesian copy. The trigger phrases are Indonesian on purpose: they are the data being detected.
-phr('CS-ID-001', 'id', 'warn', 'Generic era opener', ['di era digital', 'di era modern', 'dalam dunia yang serba cepat', 'di tengah perkembangan teknologi']);
-phr('CS-ID-002', 'id', 'warn', 'Empty summary closer', ['kesimpulannya,', 'sebagai kesimpulan,', 'secara keseluruhan,']);
-phr('CS-ID-003', 'id', 'warn', 'Cliche call to action', ['ke level berikutnya', 'mulai perjalanan anda', 'wujudkan impian anda']);
-phr('CS-ID-004', 'id', 'hint', 'Pleasantry opener', ['pertanyaan yang bagus', 'dengan senang hati saya akan membantu', 'tentu saja!']);
-phr('CS-ID-005', 'id', 'warn', 'Generic exploration invitation', ['mari kita eksplorasi', 'mari kita selami', 'mari kita bahas lebih dalam', 'kita kupas tuntas']);
-phr('CS-ID-010', 'id', 'warn', 'Superlative without evidence', ['revolusioner', 'terbaik di kelasnya', 'kelas dunia', 'mutakhir', 'terdepan']);
-phr('CS-ID-011', 'id', 'warn', 'Inflated verb', ['memberdayakan', 'merevolusi', 'menghadirkan solusi', 'mengakselerasi', 'memaksimalkan', 'mengoptimalkan']);
-phr('CS-ID-012', 'id', 'warn', 'Universal claim', ['untuk semua kebutuhan anda', 'solusi satu pintu', 'segala yang anda butuhkan', 'cocok untuk siapa saja']);
-lineRule('CS-ID-013', 'id', 'warn', 'Unsourced numeric claim', function (l) {
-  return /\b(10x|\d{2,3}%)\s*(lebih cepat|akurasi)|akurasi\s*\d{2,3}%|hemat waktu berjam/i.test(l);
-});
-phr('CS-ID-014', 'id', 'hint', 'Filler phrase', ['perlu diketahui bahwa', 'penting untuk dicatat bahwa', 'tak dapat dipungkiri', 'tidak bisa dipungkiri']);
-phr('CS-ID-015', 'id', 'hint', 'Favorite AI word in Indonesian', ['holistik', 'sinergi', 'paradigma baru', 'transformasi digital', 'komprehensif']);
-phr('CS-ID-020', 'id', 'warn', 'Repeated not-only contrast', ['bukan hanya', 'tidak hanya'], 3);
-phr('CS-ID-023', 'id', 'warn', 'Literal translation of an English idiom', ['di akhir hari', 'langkah mundur', 'bola ada di tangan', 'mengubah permainan', 'di luar kotak']);
-phr('CS-ID-024', 'id', 'hint', 'Chained transition words', ['selain itu,', 'lebih lanjut,', 'di samping itu,', 'oleh karena itu,'], 4);
-phr('CS-ID-025', 'id', 'hint', 'Self-explaining sentence', ['artinya,', 'dengan kata lain,', 'singkatnya,'], 3);
-lineRule('CS-ID-031', 'id', 'warn', 'Generic CTA button', function (l) {
-  return /<button[^>]*>\s*(mulai sekarang|pelajari lebih lanjut|klik di sini|kirim)\s*</i.test(l);
-});
-phr('CS-ID-033', 'id', 'hint', 'Artificially friendly error message', ['ups!', 'waduh!', 'aduh!']);
-phr('CS-ID-034', 'id', 'hint', 'Generic placeholder', ['masukkan teks anda di sini', 'ketik sesuatu...', 'judul di sini']);
-phr('CS-ID-035', 'id', 'hint', 'Error message without a next step', ['terjadi kesalahan.']);
 
 // Detectors below only read source text and never execute it, so they stay safe on untrusted files.
 lineRule('CS-CD-001', 'code', 'warn', 'Comment repeats the next line', function (l, lines, i) {
@@ -257,7 +232,7 @@ lineRule('CS-CD-004', 'code', 'hint', 'Section marker comment with no meaning', 
 lineRule('CS-CD-005', 'code', 'warn', 'AI trace comment', function (l) {
   if (!isComment(l)) return false;
   const t = commentText(l).toLowerCase();
-  return ['as an ai', 'let me ', 'this function does the following', 'berikut adalah', 'fungsi ini melakukan', 'here is the'].some(function (p) { return t.indexOf(p) !== -1; });
+  return ['as an ai', 'let me ', 'this function does the following', 'here is the'].some(function (p) { return t.indexOf(p) !== -1; });
 });
 lineRule('CS-CD-007', 'code', 'warn', 'TODO or FIXME without context', function (l) {
   return isComment(l) && /\b(TODO|FIXME)\b\s*:?\s*(\*\/)?\s*$/.test(l);

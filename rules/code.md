@@ -15,7 +15,7 @@ The scanner implements only some of these rules. Run `explain <RULE_ID>` to chec
 | CS-CD-002 | warn | Decorative divider banner | A comment line with a run of 10 or more `=`, `-`, `*`, `#`, `_`, or `~`, or three or more Unicode box-drawing characters (U+2500 to U+257F) |
 | CS-CD-003 | warn | Emoji in a comment or log | An emoji (emoji presentation) in a comment, `console.log`, `print`, or `logger` line |
 | CS-CD-004 | hint | Section marker comment with no meaning | `// Imports`, `// Constants`, `// Helper functions`, `// Main function`, `# Variables` |
-| CS-CD-005 | warn | AI trace comment | A comment containing "As an AI", "Let me", "Here is the", or "This function does the following". The detector also matches two Indonesian equivalents |
+| CS-CD-005 | warn | AI trace comment | A comment containing "As an AI", "Let me", "Here is the", or "This function does the following" |
 | CS-CD-006 | hint | Docstring or JSDoc that only repeats the function signature | Not implemented |
 | CS-CD-007 | warn | `TODO`/`FIXME` with no description, owner, or context | A comment that ends right after `TODO` or `FIXME` |
 | CS-CD-008 | hint | Commented-out code left behind | Three or more consecutive lines of commented-out code |

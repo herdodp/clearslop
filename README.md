@@ -2,7 +2,7 @@
 
 # clearslop
 
-**A deterministic AI-slop scanner for UI, copy (English and Indonesian), and code.**
+**A deterministic AI-slop scanner for UI, copy, and code.**
 
 Not just instructions for a model. Findings, scores, and exit codes come from a scanner, so results can be verified in pre-commit hooks and CI.
 
@@ -28,7 +28,6 @@ clearslop rejects these patterns in a measurable way. Product character still co
 | Deterministic scanner | Zero-dependency Node CLI. A model may not claim "pass" without scanner output. |
 | Slop Score 0-100 | Higher is cleaner. Stored as a baseline. |
 | Ratchet | `ratchet` fails (exit 1) when the score drops, `block` findings increase, or any new `block` or `warn` finding appears that is not in the baseline. |
-| Indonesian-language rules | Indonesian copy patterns have their own rule group (`CS-ID-*`). |
 | Project direction | `DIRECTION.md` is drafted from the project's own content, then waits for your approval. |
 | Recorded exceptions | False positives go into `allow.json` with a mandatory reason, or use `clearslop-ignore: <reason>`. |
 
@@ -67,7 +66,7 @@ block: 0  warn: 4  hint: 0
 | Command | Purpose |
 |---|---|
 | `init` | Creates `.clearslop/allow.json` and `pre-commit.sample` |
-| `scan [path] [--json] [--only ui,en,id,code]` | Scans and prints findings and the score |
+| `scan [path] [--json] [--only ui,en,code]` | Scans and prints findings and the score |
 | `baseline [path] [--only ...]` | Saves the score and the current findings to `.clearslop/baseline.json` |
 | `ratchet [path] [--only ...]` | Compares against the baseline and fails if worse |
 | `explain <RULE_ID>` | Prints a rule summary and its guide file |
@@ -118,18 +117,17 @@ Only two rules are `block`: invented testimonial names (`CS-UI-051`) and hardcod
 
 ## Rules
 
-The scanner has 63 detectors in four groups, and each rule document also lists ideas that have no detector yet. Those are marked "Not implemented".
+The scanner has 44 detectors in three groups, and each rule document also lists ideas that have no detector yet. Those are marked "Not implemented".
 
 | Group | File | Coverage |
 |---|---|---|
 | `CS-UI-*` | [`rules/ui.md`](rules/ui.md) | Color, typography, icons, layout, motion, fake content |
 | `CS-EN-*` | [`rules/copy-en.md`](rules/copy-en.md) | English copy: hype, cliches, sentence structure |
-| `CS-ID-*` | [`rules/copy-id.md`](rules/copy-id.md) | Indonesian copy: stiff translation, filler words, literal idioms |
 | `CS-CD-*` | [`rules/code.md`](rules/code.md) | Comments, error handling, hardcoded secrets |
 
 Phrase rules match whole words, case-insensitively. Multi-line gradients and glows are detected. Secrets are scanned in code files and in config files (`.json`, `.yml`, `.toml`, and similar). Files over 1 MB are skipped and reported in the output.
 
-The trigger phrases of `CS-ID-*` are Indonesian because they are the text being detected. All documentation is in English.
+All documentation is in English.
 
 ## Exceptions
 
@@ -207,7 +205,6 @@ clearslop/
   rules/
     ui.md               UI rules
     copy-en.md          English copy rules
-    copy-id.md          Indonesian copy rules
     code.md             code and comment rules
   test/
     clearslop.test.js   tests
